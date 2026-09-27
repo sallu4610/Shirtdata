@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elite Boys — Jersey Registration</title>
+<style>
+  :root{
+    --gold:#ffc107;
+    --gold-dark:#e0a800;
+    --green:#22c55e;
+    --green-dark:#16a34a;
+    --bg:#0a0a0c;
+    --panel:#141418;
+    --panel-2:#0f0f13;
+    --line:#2a2a33;
+    --text:#f4f4f7;
+    --muted:#9a9aa5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(255,193,7,.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(255,193,7,.07), transparent 60%),
+      var(--bg);
+    color:var(--text);min-height:100vh;padding:24px 16px 60px;
+  }
+  .app{max-width:920px;margin:0 auto;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand .claw{
+    width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+    font-size:1.4rem;background:linear-gradient(145deg,var(--gold),var(--gold-dark));
+    box-shadow:0 8px 24px rgba(255,193,7,.28);
+  }
+  .brand h1{font-size:1.35rem;letter-spacing:.06em;font-weight:800;text-transform:uppercase;line-height:1.1;}
+  .brand h1 span{color:var(--gold);}
+  .brand p{font-size:.72rem;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-top:3px;}
+
+  .tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);padding:6px;border-radius:14px;margin-bottom:22px;}
+  .tab{
+    flex:1;padding:13px 10px;border:none;border-radius:10px;background:transparent;
+    color:var(--muted);font-family:inherit;font-size:.86rem;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.25s;
+  }
+  .tab:hover{color:var(--text);}
+  .tab.active{background:linear-gradient(145deg,var(--gold),var(--gold-dark));color:#111;box-shadow:0 6px 18px rgba(255,193,7,.25);}
+  .panel{display:none;animation:fadeUp .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 24px;}
+  .card-title{font-size:1rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+  .card-sub{font-size:.8rem;color:var(--muted);margin-bottom:24px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+  .field input[type="text"],.field input[type="number"],.field select{
+    width:100%;padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;color:var(--text);font-family:inherit;font-size:.98rem;outline:none;transition:.22s;
+  }
+  .field select{
+    cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239a9aa5' stroke-width='3'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;background-position:right 16px center;padding-right:44px;
+  }
+  .field input::placeholder{color:#55555f;}
+  .field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,193,7,.14);background:#131318;}
+  .segmented{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .segmented label{position:relative;cursor:pointer;}
+  .segmented input{position:absolute;opacity:0;pointer-events:none;}
+  .segmented span{
+    display:block;text-align:center;padding:14px 10px;border-radius:12px;
+    border:1px solid var(--line);background:var(--panel-2);font-size:.85rem;
+    font-weight:600;color:var(--muted);transition:.22s;letter-spacing:.03em;
+  }
+  .segmented label:hover span{border-color:#3d3d48;color:var(--text);}
+  .segmented input:checked + span{border-color:var(--gold);background:rgba(255,193,7,.12);color:var(--gold);box-shadow:0 0 0 3px rgba(255,193,7,.10);}
+  .error{
+    display:none;background:rgba(255,70,70,.10);border:1px solid rgba(255,70,70,.35);
+    color:#ff8080;font-size:.84rem;padding:12px 15px;border-radius:11px;margin-bottom:18px;
+  }
+  .error.show{display:block;animation:shake .4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+  .btn-submit{
+    width:100%;padding:16px;border:none;border-radius:13px;
+    background:linear-gradient(145deg,var(--gold),var(--gold-dark));color:#111;
+    font-family:inherit;font-size:.94rem;font-weight:800;letter-spacing:.1em;
+    text-transform:uppercase;cursor:pointer;transition:.25s;margin-top:6px;
+  }
+  .btn-submit:hover:not(:disabled){box-shadow:0 12px 32px rgba(255,193,7,.35);transform:translateY(-2px);}
+  .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+
+  /* BIG GREEN VIEW SHIRT BUTTON */
+  .btn-view-big{
+    width:100%;padding:20px;border:none;border-radius:13px;
+    background:linear-gradient(145deg,var(--green),var(--green-dark));
+    color:#fff;font-family:inherit;font-size:1.05rem;font-weight:800;
+    letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+    transition:.28s;margin-top:14px;
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    box-shadow:0 6px 22px rgba(34,197,94,.28);
+    position:relative;overflow:hidden;
+  }
+  .btn-view-big::before{
+    content:'';position:absolute;top:0;left:-120%;
+    width:80%;height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
+    transform:skewX(-25deg);transition:left .7s ease;
+  }
+  .btn-view-big:hover::before{left:130%;}
+  .btn-view-big:hover{
+    box-shadow:0 14px 38px rgba(34,197,94,.45);
+    transform:translateY(-3px);
+    background:linear-gradient(145deg,#26d466,#18b955);
+  }
+  .btn-view-big:active{transform:translateY(0) scale(.99);}
+  .btn-view-big .icon{font-size:1.25rem;}
+
+  .table-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+  .pill{
+    background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);color:var(--gold);
+    font-size:.74rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    padding:7px 14px;border-radius:999px;
+  }
+  .table-scroll{overflow-x:auto;border-radius:14px;border:1px solid var(--line);}
+  table{width:100%;border-collapse:collapse;min-width:620px;}
+  thead th{
+    background:#101014;text-align:left;font-size:.7rem;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--muted);font-weight:700;
+    padding:15px 16px;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  tbody td{padding:15px 16px;font-size:.92rem;border-bottom:1px solid #1d1d24;white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr{animation:rowIn .4s ease backwards;}
+  @keyframes rowIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+  tbody tr:hover{background:rgba(255,193,7,.045);}
+  .pname{font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gold);}
+  .num-badge{
+    display:inline-block;min-width:38px;text-align:center;padding:5px 10px;border-radius:8px;
+    background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.32);color:var(--gold);
+    font-weight:800;font-size:.85rem;
+  }
+  .del{
+    background:transparent;border:1px solid rgba(255,80,80,.35);color:#ff7b7b;
+    font-family:inherit;font-size:.74rem;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;padding:7px 13px;border-radius:8px;cursor:pointer;transition:.22s;
+  }
+  .del:hover{background:rgba(255,80,80,.15);border-color:#ff5050;color:#ff5050;}
+  .del:disabled{opacity:.4;cursor:not-allowed;}
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);}
+  .empty .icon{font-size:2.6rem;margin-bottom:14px;opacity:.5;}
+  .empty p{font-size:.9rem;}
+  .spinner{
+    width:26px;height:26px;border:3px solid rgba(255,193,7,.2);
+    border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .sync-badge{
+    position:fixed;top:16px;right:16px;font-size:.7rem;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;padding:7px 13px;border-radius:999px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);
+    z-index:500;transition:.3s;
+  }
+  .sync-badge.live{color:#4ade80;border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08);}
+  .sync-badge.err{color:#ff8080;border-color:rgba(255,80,80,.4);background:rgba(255,80,80,.08);}
+
+  /* SHIRT MODAL */
+  .overlay{
+    position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
+    padding:26px;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;visibility:hidden;transition:opacity .35s ease, visibility .35s ease;
+  }
+  .overlay.show{opacity:1;visibility:visible;}
+
+  /* Fireworks canvas sits between dark background and shirt */
+  .fireworks-canvas{
+    position:fixed;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:1000;
+  }
+
+  .glow{
+    position:absolute;width:min(80vw,760px);height:min(80vw,760px);border-radius:50%;
+    background:radial-gradient(circle, rgba(255,193,7,.22), transparent 62%);
+    transform:scale(.3);opacity:0;transition:transform 1.1s ease, opacity .9s ease;pointer-events:none;
+  }
+  .overlay.show .glow{transform:scale(1);opacity:1;}
+  .shirt-wrap{
+    position:relative;z-index:1001;
+    transform:perspective(1400px) rotateY(-48deg) scale(.5);opacity:0;
+    transition:transform 1s cubic-bezier(.16,.9,.3,1.04), opacity .55s ease;will-change:transform;
+  }
+  .overlay.show .shirt-wrap{transform:perspective(1400px) rotateY(0deg) scale(1);opacity:1;}
+  .shirt-img{
+    display:block;max-width:min(88vw,860px);max-height:78vh;width:auto;
+    border-radius:16px;filter:drop-shadow(0 30px 60px rgba(0,0,0,.75));
+  }
+  .overlay.show .shirt-img{animation:floaty 5s ease-in-out 1.15s infinite;}
+  @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-16px);}}
+  .img-fallback{display:none;text-align:center;color:var(--muted);font-size:.9rem;padding:60px 30px;border:1px dashed var(--line);border-radius:16px;}
+  .close-btn{
+    position:absolute;top:-52px;right:0;width:42px;height:42px;border-radius:50%;
+    border:1px solid rgba(255,193,7,.4);background:rgba(255,193,7,.08);color:var(--gold);
+    font-size:1.4rem;line-height:1;cursor:pointer;transition:.22s;z-index:1002;
+  }
+  .close-btn:hover{background:var(--gold);color:#111;transform:rotate(90deg);}
+
+  .toast{
+    position:fixed;left:50%;bottom:32px;transform:translate(-50%,90px);
+    background:linear-gradient(145deg,var(--gold),var(--gold-dark));color:#111;
+    font-size:.86rem;font-weight:800;letter-spacing:.05em;padding:14px 26px;border-radius:12px;
+    box-shadow:0 14px 40px rgba(255,193,7,.32);opacity:0;
+    transition:.35s cubic-bezier(.2,.9,.3,1.1);z-index:1200;pointer-events:none;
+  }
+  .toast.show{transform:translate(-50%,0);opacity:1;}
+
+  @media(max-width:600px){
+    .grid-2{grid-template-columns:1fr;}
+    .card{padding:22px 18px;}
+    .brand h1{font-size:1.1rem;}
+    .close-btn{top:-48px;}
+    .sync-badge{top:auto;bottom:16px;right:16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sync-badge" id="syncBadge">Connecting…</div>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="claw">🐯</div>
+      <div>
+        <h1>Elite <span>Boys</span></h1>
+        <p>Cricket Team · Jersey Registration</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="register">Register</button>
+    <button class="tab" data-tab="data">Registered Data</button>
+  </nav>
+
+  <section class="panel active" id="register">
+    <div class="card">
+      <div class="card-title">Player Registration</div>
+      <div class="card-sub">Fill in your details to lock in your jersey.</div>
+      <div class="error" id="errorBox"></div>
+      <form id="regForm" novalidate>
+        <div class="grid-2">
+          <div class="field">
+            <label for="pname">Shirt Name</label>
+            <input type="text" id="pname" placeholder="e.g. SALMAN" maxlength="14" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pnum">Shirt Number</label>
+            <input type="number" id="pnum" placeholder="1 - 99" min="1" max="99" autocomplete="off">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="psize">Shirt Size</label>
+            <select id="psize">
+              <option value="" disabled selected>Select size</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sleeves</label>
+            <div class="segmented">
+              <label>
+                <input type="radio" name="sleeves" value="Half Sleeves" checked>
+                <span>Half Sleeves</span>
+              </label>
+              <label>
+                <input type="radio" name="sleeves" value="Full Sleeves">
+                <span>Full Sleeves</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" id="submitBtn">Register Player</button>
+
+        <!-- BIG GREEN VIEW SHIRT BUTTON -->
+        <button type="button" class="btn-view-big" id="viewShirtBtn">
+          <span class="icon">👕</span>
+          <span>View Shirt</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel" id="data">
+    <div class="card">
+      <div class="table-head">
+        <div>
+          <div class="card-title">Registered Players</div>
+          <div class="card-sub" style="margin-bottom:0;">Live · synced across all devices</div>
+        </div>
+        <div class="pill"><span id="count">0</span> Players</div>
+      </div>
+      <div class="empty" id="loading">
+        <div class="spinner"></div>
+        <p>Loading registrations…</p>
+      </div>
+      <div class="empty" id="empty" style="display:none;">
+        <div class="icon">📋</div>
+        <p>No players registered yet.<br>Head to the <strong>Register</strong> tab to add the first one.</p>
+      </div>
+      <div class="table-scroll" id="tableWrap" style="display:none;">
+        <table id="table">
+          <thead>
+            <tr>
+              <th>#</th><th>Shirt Name</th><th>Number</th><th>Size</th><th>Sleeves</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay">
+  <canvas class="fireworks-canvas" id="fireworksCanvas"></canvas>
+  <div class="glow"></div>
+  <div class="shirt-wrap">
+    <button class="close-btn" id="closeBtn" aria-label="Close">×</button>
+    <img src="https://i.postimg.cc/52k0yfBh/59e439ea-4adf-4f42-a2ba-bc32ea611ce5.png"
+         alt="Elite Boys Jersey" class="shirt-img" id="shirtImg" crossorigin="anonymous">
+    <div class="img-fallback" id="imgFallback">
+      ⚠️ Could not load the shirt image.<br>Please check your internet connection.
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Player Registered ✓</div>
+
+<script type="module">
+/* ============ FIREBASE REALTIME DATABASE ============ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getDatabase, ref, onValue, set, get, remove
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD_4WjPLZRDdiX5KI2DW8CfUN7x45Q86Rk",
+  authDomain: "shirt-data.firebaseapp.com",
+  databaseURL: "https://shirt-data-default-rtdb.firebaseio.com",
+  projectId: "shirt-data",
+  storageBucket: "shirt-data.firebasestorage.app",
+  messagingSenderId: "1092064789032",
+  appId: "1:1092064789032:web:d7841e9d380f9a03c86b1d",
+  measurementId: "G-8M5VSQ9MPS"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+/* ============ ELEMENTS ============ */
+const tabs         = document.querySelectorAll('.tab');
+const panels       = document.querySelectorAll('.panel');
+const form         = document.getElementById('regForm');
+const errorBox     = document.getElementById('errorBox');
+const tbody        = document.getElementById('tbody');
+const emptyState   = document.getElementById('empty');
+const loadingState = document.getElementById('loading');
+const tableWrap    = document.getElementById('tableWrap');
+const countEl      = document.getElementById('count');
+const overlay      = document.getElementById('overlay');
+const viewShirtBtn = document.getElementById('viewShirtBtn');
+const closeBtn     = document.getElementById('closeBtn');
+const shirtImg     = document.getElementById('shirtImg');
+const imgFallback  = document.getElementById('imgFallback');
+const toast        = document.getElementById('toast');
+const syncBadge    = document.getElementById('syncBadge');
+const submitBtn    = document.getElementById('submitBtn');
+const fireworksCanvas = document.getElementById('fireworksCanvas');
+const fctx = fireworksCanvas.getContext('2d');
+
+/* ============ STATE ============ */
+let players = [];
+let firstLoad = true;
+
+/* ============ TABS ============ */
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============ HELPERS ============ */
+function esc(str) {
+  return String(str).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+let errorTimer;
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.classList.add('show');
+  clearTimeout(errorTimer);
+  errorTimer = setTimeout(() => errorBox.classList.remove('show'), 4000);
+}
+function setSync(state, text) {
+  syncBadge.className = 'sync-badge' + (state ? ' ' + state : '');
+  syncBadge.textContent = text;
+}
+
+/* ============ RENDER ============ */
+function render() {
+  countEl.textContent = players.length;
+  if (!players.length) {
+    emptyState.style.display = 'block';
+    tableWrap.style.display  = 'none';
+    tbody.innerHTML = '';
+    return;
+  }
+  emptyState.style.display = 'none';
+  tableWrap.style.display  = 'block';
+  tbody.innerHTML = players.map((p, i) => `
+    <tr style="animation-delay:${i * 0.045}s">
+      <td style="color:#6a6a76;">${i + 1}</td>
+      <td class="pname">${esc(p.name)}</td>
+      <td><span class="num-badge">${esc(p.number)}</span></td>
+      <td>${esc(p.size)}</td>
+      <td>${esc(p.sleeves)}</td>
+      <td><button class="del" data-id="${esc(p.id)}">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+/* ============ LIVE LISTENER ============ */
+const playersRef = ref(db, 'players');
+onValue(playersRef,
+  (snapshot) => {
+    const data = snapshot.val() || {};
+    players = Object.keys(data).map(key => ({
+      id: key,
+      number: data[key].number || key,
+      name: data[key].name || '',
+      size: data[key].size || '',
+      sleeves: data[key].sleeves || '',
+      createdAt: data[key].createdAt || 0
+    }));
+    players.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    if (firstLoad) { loadingState.style.display = 'none'; firstLoad = false; }
+    render();
+    setSync('live', '● Live');
+  },
+  (error) => {
+    console.error('Realtime DB error:', error);
+    loadingState.style.display = 'none';
+    setSync('err', '⚠ Offline');
+    showError('Could not connect to Realtime Database. Check your rules and internet.');
+  }
+);
+
+/* ============ DELETE ============ */
+tbody.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.del');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const player = players.find(p => p.id === id);
+  const label = player ? `#${player.number} ${player.name}` : 'this player';
+  if (!confirm(`Delete ${label}?`)) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    await remove(ref(db, 'players/' + id));
+    showToast('Player Removed');
+  } catch (err) {
+    console.error(err);
+    showError('Could not delete. Please try again.');
+    btn.disabled = false; btn.textContent = 'Delete';
+  }
+});
+
+/* ============ REGISTER ============ */
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name    = document.getElementById('pname').value.trim();
+  const number  = document.getElementById('pnum').value.trim();
+  const size    = document.getElementById('psize').value;
+  const sleeves = document.querySelector('input[name="sleeves"]:checked').value;
+
+  if (!name) return showError('Please enter the shirt name.');
+  if (!/^[A-Za-z0-9 .'-]+$/.test(name))
+    return showError('Shirt name can only contain letters, numbers and spaces.');
+  if (!number) return showError('Please enter the shirt number.');
+  const numVal = Number(number);
+  if (!Number.isInteger(numVal) || numVal < 1 || numVal > 99)
+    return showError('Shirt number must be a whole number between 1 and 99.');
+  if (!size) return showError('Please select a shirt size.');
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving…';
+  try {
+    const playerRef = ref(db, 'players/' + numVal);
+    const snap = await get(playerRef);
+    if (snap.exists()) {
+      const owner = (snap.val() && snap.val().name) || 'another player';
+      showError(`Shirt number ${numVal} is already taken by ${owner}.`);
+      return;
+    }
+    await set(playerRef, {
+      name: name.toUpperCase(), number: String(numVal),
+      size: size, sleeves: sleeves, createdAt: Date.now()
+    });
+    form.reset();
+    document.querySelector('input[name="sleeves"][value="Half Sleeves"]').checked = true;
+    errorBox.classList.remove('show');
+    showToast('Player Registered ✓');
+  } catch (err) {
+    console.error(err);
+    showError('Could not save. Check your connection and Realtime Database rules.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Register Player';
+  }
+});
+
+/* ============================================================
+   FIREWORKS ENGINE
+   ============================================================ */
+let fireworksRunning = false;
+let particles = [];
+let rafId = null;
+let autoLaunchTimer = null;
+
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  fireworksCanvas.width  = window.innerWidth  * dpr;
+  fireworksCanvas.height = window.innerHeight * dpr;
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+const PALETTES = [
+  ['#ffc107','#ffdb4d','#e0a800'],
+  ['#ff4d6d','#ff8fa3','#ff1e56'],
+  ['#4ade80','#22c55e','#16a34a'],
+  ['#60a5fa','#93c5fd','#2563eb'],
+  ['#c084fc','#e9d5ff','#9333ea'],
+  ['#fb923c','#fdba74','#ea580c'],
+  ['#ffffff','#ffc107','#ff4d6d']
+];
+
+function launchFirework(x, y, palette) {
+  const colors = palette || PALETTES[Math.floor(Math.random() * PALETTES.length)];
+  const count = 60 + Math.floor(Math.random() * 50);
+  const baseSpeed = 2.5 + Math.random() * 2;
+
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.15;
+    const speed = baseSpeed * (0.6 + Math.random() * 0.7);
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: 0.012 + Math.random() * 0.015,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 1.4 + Math.random() * 2.2,
+      gravity: 0.045 + Math.random() * 0.03
+    });
+  }
+}
+
+function tickFireworks() {
+  fctx.globalCompositeOperation = 'destination-out';
+  fctx.fillStyle = 'rgba(0,0,0,0.20)';
+  fctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  fctx.globalCompositeOperation = 'lighter';
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += p.gravity;
+    p.vx *= 0.985;
+    p.vy *= 0.985;
+    p.life -= p.decay;
+
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+    fctx.globalAlpha = Math.max(p.life, 0);
+    fctx.fillStyle = p.color;
+    fctx.beginPath();
+    fctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+    fctx.fill();
+  }
+
+  fctx.globalAlpha = 1;
+
+  if (particles.length > 0 || fireworksRunning) {
+    rafId = requestAnimationFrame(tickFireworks);
+  } else {
+    // fully clear canvas when done
+    fctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    rafId = null;
+  }
+}
+
+function startFireworks() {
+  resizeCanvas();
+  fctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+  if (!fireworksRunning) {
+    fireworksRunning = true;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tickFireworks);
+  }
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  // initial big burst near the shirt, then a spread of bursts
+  launchFirework(w * 0.5, h * 0.5, ['#ffc107','#ffdb4d','#ffffff']);
+
+  const launchPoints = [
+    [w * 0.15, h * 0.30], [w * 0.85, h * 0.30],
+    [w * 0.25, h * 0.65], [w * 0.75, h * 0.65],
+    [w * 0.50, h * 0.20], [w * 0.10, h * 0.50],
+    [w * 0.90, h * 0.50], [w * 0.50, h * 0.80]
+  ];
+
+  launchPoints.forEach((pt, i) => {
+    setTimeout(() => {
+      if (!overlay.classList.contains('show')) return;
+      launchFirework(pt[0], pt[1]);
+    }, 180 + i * 220);
+  });
+
+  // keep it lively with periodic random bursts while modal is open
+  clearInterval(autoLaunchTimer);
+  autoLaunchTimer = setInterval(() => {
+    if (!overlay.classList.contains('show')) return;
+    const rx = w * (0.15 + Math.random() * 0.7);
+    const ry = h * (0.15 + Math.random() * 0.55);
+    launchFirework(rx, ry);
+  }, 900);
+
+  // stop auto launches after a while (still keeps existing particles animating)
+  setTimeout(() => {
+    clearInterval(autoLaunchTimer);
+    fireworksRunning = false;
+  }, 6000);
+}
+
+function stopFireworks() {
+  clearInterval(autoLaunchTimer);
+  fireworksRunning = false;
+  // let existing particles finish, then canvas clears itself
+  if (!rafId) rafId = requestAnimationFrame(tickFireworks);
+}
+
+window.addEventListener('resize', () => {
+  if (overlay.classList.contains('show')) resizeCanvas();
+});
+
+/* ============ SHIRT MODAL ============ */
+function openShirt() {
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  // small delay so modal + canvas are ready
+  setTimeout(startFireworks, 120);
+}
+
+function closeShirt() {
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+  stopFireworks();
+}
+
+viewShirtBtn.addEventListener('click', openShirt);
+closeBtn.addEventListener('click', closeShirt);
+
+overlay.addEventListener('click', e => {
+  if (e.target === overlay) closeShirt();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && overlay.classList.contains('show')) closeShirt();
+});
+
+shirtImg.addEventListener('error', () => {
+  shirtImg.style.display = 'none';
+  imgFallback.style.display = 'block';
+});
+</script>
+</body>
+</html>
