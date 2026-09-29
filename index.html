@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Boys — Jersey Registration</title>
+<title>RISING TIGERS — Jersey Registration</title>
 <style>
   :root{
     --gold:#ffc107;
@@ -173,13 +173,7 @@
     opacity:0;visibility:hidden;transition:opacity .35s ease, visibility .35s ease;
   }
   .overlay.show{opacity:1;visibility:visible;}
-
-  /* Fireworks canvas sits between dark background and shirt */
-  .fireworks-canvas{
-    position:fixed;inset:0;width:100%;height:100%;
-    pointer-events:none;z-index:1000;
-  }
-
+  .fireworks-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1000;}
   .glow{
     position:absolute;width:min(80vw,760px);height:min(80vw,760px);border-radius:50%;
     background:radial-gradient(circle, rgba(255,193,7,.22), transparent 62%);
@@ -206,12 +200,58 @@
   }
   .close-btn:hover{background:var(--gold);color:#111;transform:rotate(90deg);}
 
+  /* PASSWORD MODAL */
+  .pw-overlay{
+    position:fixed;inset:0;z-index:1500;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;background:rgba(0,0,0,.82);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    opacity:0;visibility:hidden;transition:opacity .25s ease, visibility .25s ease;
+  }
+  .pw-overlay.show{opacity:1;visibility:visible;}
+  .pw-box{
+    width:100%;max-width:380px;
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    padding:26px 24px;
+    transform:translateY(14px) scale(.97);opacity:0;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1.1), opacity .25s ease;
+    box-shadow:0 24px 70px rgba(0,0,0,.6);
+  }
+  .pw-overlay.show .pw-box{transform:translateY(0) scale(1);opacity:1;}
+  .pw-icon{
+    width:52px;height:52px;border-radius:14px;display:grid;place-items:center;
+    font-size:1.5rem;margin-bottom:14px;
+    background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);color:var(--gold);
+  }
+  .pw-title{font-size:1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+  .pw-sub{font-size:.82rem;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+  .pw-input{
+    width:100%;padding:14px 16px;background:var(--panel-2);
+    border:1px solid var(--line);border-radius:12px;color:var(--text);
+    font-family:inherit;font-size:.98rem;outline:none;transition:.22s;letter-spacing:.08em;
+  }
+  .pw-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,193,7,.14);background:#131318;}
+  .pw-input.shake{animation:shake .4s;border-color:#ff5050;}
+  .pw-err{font-size:.8rem;color:#ff8080;margin-top:10px;min-height:16px;opacity:0;transition:opacity .2s;}
+  .pw-err.show{opacity:1;}
+  .pw-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+  .pw-btn{
+    padding:13px;border-radius:11px;border:none;font-family:inherit;
+    font-size:.82rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    cursor:pointer;transition:.22s;
+  }
+  .pw-btn-cancel{background:transparent;border:1px solid var(--line);color:var(--muted);}
+  .pw-btn-cancel:hover{border-color:#3d3d48;color:var(--text);}
+  .pw-btn-confirm{background:linear-gradient(145deg,#ef4444,#b91c1c);color:#fff;}
+  .pw-btn-confirm:hover{box-shadow:0 10px 26px rgba(239,68,68,.35);transform:translateY(-1px);}
+  .pw-btn-confirm:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+
   .toast{
     position:fixed;left:50%;bottom:32px;transform:translate(-50%,90px);
     background:linear-gradient(145deg,var(--gold),var(--gold-dark));color:#111;
     font-size:.86rem;font-weight:800;letter-spacing:.05em;padding:14px 26px;border-radius:12px;
     box-shadow:0 14px 40px rgba(255,193,7,.32);opacity:0;
-    transition:.35s cubic-bezier(.2,.9,.3,1.1);z-index:1200;pointer-events:none;
+    transition:.35s cubic-bezier(.2,.9,.3,1.1);z-index:1600;pointer-events:none;
   }
   .toast.show{transform:translate(-50%,0);opacity:1;}
 
@@ -233,7 +273,7 @@
     <div class="brand">
       <div class="claw">🐯</div>
       <div>
-        <h1>Rising <span>Tigers</span></h1>
+        <h1>Elite <span>Boys</span></h1>
         <p>Cricket Team · Jersey Registration</p>
       </div>
     </div>
@@ -286,7 +326,6 @@
         </div>
         <button type="submit" class="btn-submit" id="submitBtn">Register Player</button>
 
-        <!-- BIG GREEN VIEW SHIRT BUTTON -->
         <button type="button" class="btn-view-big" id="viewShirtBtn">
           <span class="icon">👕</span>
           <span>View Shirt</span>
@@ -326,15 +365,31 @@
   </section>
 </div>
 
+<!-- SHIRT MODAL -->
 <div class="overlay" id="overlay">
   <canvas class="fireworks-canvas" id="fireworksCanvas"></canvas>
   <div class="glow"></div>
   <div class="shirt-wrap">
     <button class="close-btn" id="closeBtn" aria-label="Close">×</button>
-    <img src="https://i.postimg.cc/ZKzZfCH5/517bd2f1-7621-4d2a-8c2c-405eb6ed41dd.png"
+    <img src="https://i.postimg.cc/52k0yfBh/59e439ea-4adf-4f42-a2ba-bc32ea611ce5.png"
          alt="Elite Boys Jersey" class="shirt-img" id="shirtImg" crossorigin="anonymous">
     <div class="img-fallback" id="imgFallback">
       ⚠️ Could not load the shirt image.<br>Please check your internet connection.
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <div class="pw-icon">🔒</div>
+    <div class="pw-title">Password Required</div>
+    <div class="pw-sub">Enter the admin password to delete this player. This will remove them from the database.</div>
+    <input type="password" class="pw-input" id="pwInput" placeholder="Enter password" autocomplete="off">
+    <div class="pw-err" id="pwErr">Incorrect password. Try again.</div>
+    <div class="pw-actions">
+      <button class="pw-btn pw-btn-cancel" id="pwCancel">Cancel</button>
+      <button class="pw-btn pw-btn-confirm" id="pwConfirm">Delete</button>
     </div>
   </div>
 </div>
@@ -383,9 +438,17 @@ const submitBtn    = document.getElementById('submitBtn');
 const fireworksCanvas = document.getElementById('fireworksCanvas');
 const fctx = fireworksCanvas.getContext('2d');
 
+const pwOverlay = document.getElementById('pwOverlay');
+const pwInput   = document.getElementById('pwInput');
+const pwErr     = document.getElementById('pwErr');
+const pwCancel  = document.getElementById('pwCancel');
+const pwConfirm = document.getElementById('pwConfirm');
+
 /* ============ STATE ============ */
 let players = [];
 let firstLoad = true;
+let pendingDeleteId = null;
+const DELETE_PASSWORD = 'Sallu2009';
 
 /* ============ TABS ============ */
 tabs.forEach(tab => {
@@ -471,25 +534,6 @@ onValue(playersRef,
   }
 );
 
-/* ============ DELETE ============ */
-tbody.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.del');
-  if (!btn) return;
-  const id = btn.dataset.id;
-  const player = players.find(p => p.id === id);
-  const label = player ? `#${player.number} ${player.name}` : 'this player';
-  if (!confirm(`Delete ${label}?`)) return;
-  btn.disabled = true; btn.textContent = '…';
-  try {
-    await remove(ref(db, 'players/' + id));
-    showToast('Player Removed');
-  } catch (err) {
-    console.error(err);
-    showError('Could not delete. Please try again.');
-    btn.disabled = false; btn.textContent = 'Delete';
-  }
-});
-
 /* ============ REGISTER ============ */
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -532,6 +576,80 @@ form.addEventListener('submit', async (e) => {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Register Player';
   }
+});
+
+/* ============ DELETE (PASSWORD PROTECTED) ============ */
+function openPwModal(id) {
+  pendingDeleteId = id;
+  pwInput.value = '';
+  pwErr.classList.remove('show');
+  pwInput.classList.remove('shake');
+  pwOverlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => pwInput.focus(), 120);
+}
+
+function closePwModal() {
+  pwOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+  pendingDeleteId = null;
+  pwInput.value = '';
+  pwErr.classList.remove('show');
+  pwInput.classList.remove('shake');
+}
+
+async function confirmDelete() {
+  const entered = pwInput.value;
+
+  if (entered !== DELETE_PASSWORD) {
+    pwErr.classList.add('show');
+    pwInput.classList.remove('shake');
+    void pwInput.offsetWidth;
+    pwInput.classList.add('shake');
+    pwInput.value = '';
+    pwInput.focus();
+    return;
+  }
+
+  const id = pendingDeleteId;
+  if (!id) return closePwModal();
+
+  pwConfirm.disabled = true;
+  pwConfirm.textContent = 'Deleting…';
+
+  try {
+    await remove(ref(db, 'players/' + id));
+    showToast('Player Removed ✓');
+    closePwModal();
+  } catch (err) {
+    console.error(err);
+    showError('Could not delete. Please check your connection and try again.');
+  } finally {
+    pwConfirm.disabled = false;
+    pwConfirm.textContent = 'Delete';
+  }
+}
+
+tbody.addEventListener('click', (e) => {
+  const btn = e.target.closest('.del');
+  if (!btn) return;
+  openPwModal(btn.dataset.id);
+});
+
+pwConfirm.addEventListener('click', confirmDelete);
+pwCancel.addEventListener('click', closePwModal);
+
+pwOverlay.addEventListener('click', (e) => {
+  if (e.target === pwOverlay) closePwModal();
+});
+
+pwInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); confirmDelete(); }
+  if (e.key === 'Escape') closePwModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && pwOverlay.classList.contains('show')) closePwModal();
 });
 
 /* ============================================================
@@ -609,7 +727,6 @@ function tickFireworks() {
   if (particles.length > 0 || fireworksRunning) {
     rafId = requestAnimationFrame(tickFireworks);
   } else {
-    // fully clear canvas when done
     fctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     rafId = null;
   }
@@ -628,7 +745,6 @@ function startFireworks() {
   const w = window.innerWidth;
   const h = window.innerHeight;
 
-  // initial big burst near the shirt, then a spread of bursts
   launchFirework(w * 0.5, h * 0.5, ['#ffc107','#ffdb4d','#ffffff']);
 
   const launchPoints = [
@@ -645,7 +761,6 @@ function startFireworks() {
     }, 180 + i * 220);
   });
 
-  // keep it lively with periodic random bursts while modal is open
   clearInterval(autoLaunchTimer);
   autoLaunchTimer = setInterval(() => {
     if (!overlay.classList.contains('show')) return;
@@ -654,7 +769,6 @@ function startFireworks() {
     launchFirework(rx, ry);
   }, 900);
 
-  // stop auto launches after a while (still keeps existing particles animating)
   setTimeout(() => {
     clearInterval(autoLaunchTimer);
     fireworksRunning = false;
@@ -664,7 +778,6 @@ function startFireworks() {
 function stopFireworks() {
   clearInterval(autoLaunchTimer);
   fireworksRunning = false;
-  // let existing particles finish, then canvas clears itself
   if (!rafId) rafId = requestAnimationFrame(tickFireworks);
 }
 
@@ -676,7 +789,6 @@ window.addEventListener('resize', () => {
 function openShirt() {
   overlay.classList.add('show');
   document.body.style.overflow = 'hidden';
-  // small delay so modal + canvas are ready
   setTimeout(startFireworks, 120);
 }
 
